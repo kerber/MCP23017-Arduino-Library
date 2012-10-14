@@ -18,6 +18,11 @@
 
 #include "MCP23017.h"
 
+// IMPORTANT on byte order:
+// Note on Writing words: The MSB is for GPA7-0 and the LSB is for GPB7-0
+// Pinnumbers 0-7 = GPB0-7, 8-15 = GPA0-7
+// This comes across as slightly un-intuitive when programming
+
 MCP23017::MCP23017() {}
 
 void MCP23017::begin(int i2cAddress) {
@@ -80,7 +85,6 @@ word MCP23017::digitalWordRead() {
 	_GPIO = readRegister(MCP23017_GPIO);
 	return _GPIO;
 }
-
 void MCP23017::digitalWordWrite(word w) {
 	_GPIO = w;
 	writeRegister(MCP23017_GPIO, (word)_GPIO);

@@ -30,6 +30,12 @@
 **/
 
 
+// IMPORTANT on byte order:
+// Note on Writing words: The MSB is for GPA7-0 and the LSB is for GPB7-0
+// Pinnumbers 0-7 = GPB0-7, 8-15 = GPA0-7
+// This comes across as slightly un-intuitive when programming
+
+
 #include "Wire.h"
 
 //Register defines from data sheet - we set IOCON.BANK to 0
