@@ -55,7 +55,7 @@ class MCP23017
     //so i2cAddress should be between 0 and 7
     MCP23017();
     void begin(int i2cAddress);
-    void init();
+    bool init();
 
     //These functions provide an 'arduino'-like functionality for accessing
     //pin states/pullups etc.

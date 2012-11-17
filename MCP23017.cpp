@@ -34,7 +34,9 @@ void MCP23017::begin(int i2cAddress) {
 	_GPPU = 0x0000;
 }
 
-void MCP23017::init()	{
+bool MCP23017::init()	{
+		// If this value is true (return value of this function), we assume the board actually responded and is "online"
+	bool retVal = readRegister(0x00)==65535;
 	
 	//Set the IOCON.BANK bit to 0 to enable sequential addressing
 	//IOCON 'default' address is 0x05, but will
@@ -43,6 +45,8 @@ void MCP23017::init()	{
 	
 	//Our pins default to being outputs by default.
 	writeRegister(MCP23017_IODIR, (word)_IODIR);
+	
+	return retVal;
 }
 
 void MCP23017::pinMode(int pin, int mode) {
