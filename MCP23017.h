@@ -42,6 +42,7 @@
 //as it is easier to manage the registers sequentially.
 #define MCP23017_IODIR 0x00
 #define MCP23017_IPOL 0x2
+#define MCP23017_GPINTEN 0x04
 #define MCP23017_GPPU 0x0C
 #define MCP23017_GPIO 0x12
 
@@ -49,52 +50,55 @@
 
 class MCP23017
 {
-  public:
-    //NB the i2c address here is the value of the A0, A1, A2 pins ONLY
-    //as the class takes care of its internal base address.
-    //so i2cAddress should be between 0 and 7
-    MCP23017();
-    void begin(int i2cAddress);
-    bool init();
+	public:
+		//NB the i2c address here is the value of the A0, A1, A2 pins ONLY
+		//as the class takes care of its internal base address.
+		//so i2cAddress should be between 0 and 7
+		MCP23017();
+		void begin(int i2cAddress);
+		bool init();
+	
+		//These functions provide an 'arduino'-like functionality for accessing
+		//pin states/pullups etc.
+		void pinMode(int pin, int mode);
+		void digitalWrite(int pin, int val);
+		int digitalRead(int pin);
+		
+		//These provide a more advanced mapping of the chip functionality
+		//See the data sheet for more information on what they do
+		
+		//Returns a word with the current pin states (ie contents of the GPIO register)
+		word digitalGPIOWordRead();
+		
+		//Allows you to write a word to the GPIO register
+		void digitalGPIOWordWrite(word w);
+		
+		//Sets up the polarity mask that the MCP23017 supports
+		//if set to 1, it will flip the actual pin value.
+		void inputPolarityMask(word mask);
+		
+		//Sets which pins are inputs or outputs (1 = input, 0 = output) NB Opposite to arduino's
+		//definition for these
+		void inputOutputMask(word mask);
+		
+		//Allows enabling of the internal 100k pullup resisters (1 = enabled, 0 = disabled)
+		void internalPullupMask(word mask);
+		
+		//Allows enabling of the pin interrupts (1 = enabled, 0 = disabled)
+		void interruptMask(word mask);
+	
+	
 
-    //These functions provide an 'arduino'-like functionality for accessing
-    //pin states/pullups etc.
-    void pinMode(int pin, int mode);
-    void digitalWrite(int pin, int val);
-    int digitalRead(int pin);
 
-    //These provide a more advanced mapping of the chip functionality
-    //See the data sheet for more information on what they do
-
-    //Returns a word with the current pin states (ie contents of the GPIO register)
-    word digitalWordRead();
-
-    //Allows you to write a word to the GPIO register
-    void digitalWordWrite(word w);
-
-    //Sets up the polarity mask that the MCP23017 supports
-    //if set to 1, it will flip the actual pin value.
-    void inputPolarityMask(word mask);
-
-    //Sets which pins are inputs or outputs (1 = input, 0 = output) NB Opposite to arduino's
-    //definition for these
-    void inputOutputMask(word mask);
-
-    //Allows enabling of the internal 100k pullup resisters (1 = enabled, 0 = disabled)
-    void internalPullupMask(word mask);
-
-    //Interrupt functionality (not yet implemented)
-
-
-  private:
-	void writeRegister(int regaddress, byte val);
-	void writeRegister(int regaddress, word val);
-	word readRegister(int regaddress);
-
-	//Our actual i2c address
-	byte _i2cAddress;
-
-	//Cached copies of the register vales
-	word _GPIO, _IODIR, _GPPU;
+	private:
+		void writeRegister(int regaddress, byte val);
+		word readRegister(int regaddress);
+		void writeRegister(int regaddress, word val);
+		
+		//Our actual i2c address
+		byte _i2cAddress;
+		
+		//Cached copies of the register vales
+		word _GPIO, _IODIR, _GPPU;
 };
 #endif 
