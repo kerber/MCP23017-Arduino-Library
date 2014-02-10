@@ -1,19 +1,20 @@
-/*  MCP23017 library for Arduino
-    Copyright (C) 2009 David Pye    <davidmpye@gmail.com  
+/*	MCP23017 library for Arduino
+	Copyright (C) 2009 David Pye    <davidmpye@gmail.com  
 	Copyright (C) 2012 Kasper Skårhøj <kasperskaarhoj@gmail.com>
+	Copyright (C) 2014 Dustin Kerber <dustin.kerber@gmail.com>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "MCP23017.h"
@@ -30,20 +31,23 @@ void MCP23017::begin(int i2cAddress) {
 
 	//Default state is 0 for our pins
 	_GPIO = 0x0000;
-	_IODIR = 0x0000;
+	_IODIR = 0xFFFF;
 	_GPPU = 0x0000;
+	_GPINTEN = 0xFFFF;
 }
 
 bool MCP23017::init()	{
-		// If this value is true (return value of this function), we assume the board actually responded and is "online"
+	// If this value is true (return value of this function), 
+	//we assume the board actually responded and is "online"
 	bool retVal = readRegister(0x00)==65535;
 	
-	//Set the IOCON.BANK bit to 0 to enable sequential addressing
-	//IOCON 'default' address is 0x05, but will
-	//change to our definition of IOCON once this write completes.
-	writeRegister(0x05, (byte)0x0);
+	//Set the IOCON.MIRROR bit to 1 to enable INT mirroring
+	//Set the IOCON.ODR bit to 1 to enable INT open-drain
+	writeRegister(0x0A, (byte)0x44);
+	//Set INTCON to 0 to trigger INT by compare to prev value
+	writeRegister(0x08, 0x0000);
 	
-	//Our pins default to being outputs by default.
+	//Our pins default to input.
 	writeRegister(MCP23017_IODIR, (word)_IODIR);
 	
 	return retVal;
@@ -85,11 +89,12 @@ void MCP23017::digitalWrite(int pin, int val) {
 	}
 }
 
-word MCP23017::digitalWordRead() {
+word MCP23017::digitalGPIOWordRead() {
 	_GPIO = readRegister(MCP23017_GPIO);
 	return _GPIO;
 }
-void MCP23017::digitalWordWrite(word w) {
+
+void MCP23017::digitalGPIOWordWrite(word w) {
 	_GPIO = w;
 	writeRegister(MCP23017_GPIO, (word)_GPIO);
 }
@@ -106,6 +111,11 @@ void MCP23017::inputOutputMask(word mask) {
 void MCP23017::internalPullupMask(word mask) {
 	_GPPU = mask;
 	writeRegister(MCP23017_GPPU, (word)_GPPU);
+}
+
+void MCP23017::interruptMask(word mask) {
+	_GPINTEN = mask;
+	writeRegister(MCP23017_GPINTEN, (word)_GPINTEN);
 }
 
 //PRIVATE
