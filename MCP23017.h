@@ -99,6 +99,6 @@ class MCP23017
 		byte _i2cAddress;
 		
 		//Cached copies of the register vales
-		word _GPIO, _IODIR, _GPPU;
+		word _GPIO, _IODIR, _GPPU, _GPINTEN;
 };
 #endif 
