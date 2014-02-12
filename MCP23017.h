@@ -1,6 +1,7 @@
 /*  MCP23017 library for Arduino
     Copyright (C) 2009 David Pye    <davidmpye@gmail.com>
 	Copyright (C) 2012 Kasper Skårhøj <kasperskaarhoj@gmail.com>
+	Copyright (C) 2014 Dustin Kerber <dustin.kerber@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
